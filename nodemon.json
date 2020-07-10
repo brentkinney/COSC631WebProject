@@ -1,0 +1,7 @@
+{
+    "env": {
+        "MONGO_USER": "eventUser",
+        "MONGO_PASSWORD": "cosc631eventappuser",
+        "MONGO_DB": "EventApp"
+    }
+}
