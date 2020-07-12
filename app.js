@@ -3,7 +3,10 @@ const bodyParser = require('body-parser');
 const graphqlHttp = require('express-graphql').graphqlHTTP;
 const { buildSchema } = require('graphql');
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const Event = require('./models/event');
+const User = require('./models/user');
+
 
 const app = express();
 
@@ -23,6 +26,14 @@ app.use(
         date: String!
     }
 
+    type User {
+        _id: ID!
+        email: String!
+        password: String
+    }
+
+    
+
     input EventInput {
         title: String!
         description: String!
@@ -31,12 +42,18 @@ app.use(
         date: String! 
     }
     
+    input UserInput {
+        email: String!
+        password: String!
+    }
+
     type RootQuery {
         events: [Event!]!
     }
 
     type RootMutation {
         createEvent(eventInput: EventInput): Event
+        createUser(userInput: UserInput): User
     }
 
     schema {
@@ -75,10 +92,34 @@ app.use(
             }            
         }
     },
+    createUser: args => {
+        return bcrypt
+        .hash(args.userInput.password, 12)
+        .then(hashedPassword => {
+            const user =  new User({
+                email: args.userInput.email,
+                password: hashedPassword                
+            });
+            console.log(user.email, user.hashedPassword);
+            return user.save();
+        })
+        .then(result => {
+            console.log(result._doc);
+            return { ...result._doc, _id: result.id }
+        })
+        .catch(err => {
+            console.log(err);           
+            throw err;            
+        });        
+    },
     graphiql: true
 }));
 
-mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cosc631.oc8gy.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`)
+mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cosc631.oc8gy.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`,
+{
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
 .then(() => {
     app.listen(3000);
 }).catch(err => {
