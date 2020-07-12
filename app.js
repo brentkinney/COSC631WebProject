@@ -51,7 +51,7 @@ app.use(
         events: [Event!]!
     }
 
-    type RootMutation {
+    type RootMutation {       
         createEvent(eventInput: EventInput): Event
         createUser(userInput: UserInput): User
     }
@@ -73,7 +73,7 @@ app.use(
                 console.log(err);
                 throw err;
             }
-        },
+        },    
         createEvent: async args => {
            const event = new Event({
                 title: args.eventInput.title,
@@ -90,30 +90,31 @@ app.use(
                 console.log(err);
                 throw err;
             }            
+        },
+    
+        createUser: args => {
+            return bcrypt
+            .hash(args.userInput.password, 12)
+            .then(hashedPassword => {
+                const user =  new User({
+                    email: args.userInput.email,
+                    password: hashedPassword                
+                });
+                console.log(user.email, user.hashedPassword);
+                return user.save();
+            })
+            .then(result => {
+                console.log(result._doc);
+                return { ...result._doc, _id: result.id }
+            })
+            .catch(err => {
+                console.log(err);           
+                throw err;            
+            });        
         }
     },
-    createUser: args => {
-        return bcrypt
-        .hash(args.userInput.password, 12)
-        .then(hashedPassword => {
-            const user =  new User({
-                email: args.userInput.email,
-                password: hashedPassword                
-            });
-            console.log(user.email, user.hashedPassword);
-            return user.save();
-        })
-        .then(result => {
-            console.log(result._doc);
-            return { ...result._doc, _id: result.id }
-        })
-        .catch(err => {
-            console.log(err);           
-            throw err;            
-        });        
-    },
     graphiql: true
-}));
+}))
 
 mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cosc631.oc8gy.mongodb.net/${process.env.MONGO_DB}?retryWrites=true&w=majority`,
 {
