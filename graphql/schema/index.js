@@ -18,7 +18,11 @@ type User {
     createdEvents: [Event!]
 }
 
-
+type LoginData {
+    userId: ID!
+    token: String!
+    tokenExpiration: Int!
+}
 
 input EventInput {
     title: String!
@@ -35,6 +39,7 @@ input UserInput {
 
 type RootQuery {
     events: [Event!]!
+    login(email: String!, password: String!): LoginData!
 }
 
 type RootMutation {       

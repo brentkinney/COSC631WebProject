@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const Event = require('../../models/event');
 const User = require('../../models/user');
-
+const jwt = require('jsonwebtoken');
 const events = async eventIds => {
     try {
         const events = await Event.find({ _id: { $in: eventIds } });
@@ -12,7 +12,7 @@ const events = async eventIds => {
                 date: new Date(event._doc.date).toISOString(),
                 createdBy: user.bind(this, event.createdBy)
             };
-        });
+        });        
     }
     catch (err) {
         throw err;
@@ -34,7 +34,10 @@ const user = async userId => {
 };
 
 module.exports = {
-    events: async () => {
+    events: async (args, req) => {
+        if (!req.isAuth) {
+            throw new Error('Unauthenticated');
+        }
         try {
             const events = await Event.find();
             return events.map(event => {
@@ -51,14 +54,17 @@ module.exports = {
             throw err;
         }
     },    
-    createEvent: async args => {
+    createEvent: async (args,req) => {
+        if (!req.isAuth) {
+            throw new Error('Unauthenticated');
+        }
         const event = new Event({
           title: args.eventInput.title,
           description: args.eventInput.description,
           price: +args.eventInput.price,
           hours: +args.eventInput.hours,
           date: new Date(args.eventInput.date),
-          createdBy: '5f1390f8c363182d08102885'
+          createdBy: req.userId
         });
         let createdEvent;
         try {
@@ -70,7 +76,7 @@ module.exports = {
                 date: new Date(event._doc.date).toISOString(),
                 createdBy: user.bind(this, result._doc.createdBy)
             };
-            const createdBy = await User.findById('5f0b95973188533ae0870a45');
+            const createdBy = await User.findById(req.userId);
             if (!createdBy) {
                 throw new Error('User not found.');
             }
@@ -103,5 +109,20 @@ module.exports = {
             console.log(err);
             throw err;
         }        
+    },
+
+    login: async ({email, password}) => {
+        const user = await User.findOne({email: email});
+        if (!user) {
+            throw new Error('User does not exist');
+        }
+        const pwMatch = await bcrypt.compare(password, user.password);
+        if (!pwMatch) {
+            throw new Error('Password is incorrect!');
+        }
+        const token = jwt.sign({userId: user.id, email: user.email}, 'validationkeystring',{
+        expiresIn: '2h'
+        });
+        return {userId: user.id, token: token, tokenExpiration: 2}
     }
 }
