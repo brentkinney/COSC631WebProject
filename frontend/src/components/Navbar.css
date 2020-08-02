@@ -1,0 +1,43 @@
+.NavBarHeader {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 3.5rem;
+    background: olive;
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.NavBar h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.NavItems {
+    margin: 0 0 0 1.5rem;
+    
+}
+
+.NavItems ul {
+    display: flex;
+    padding: 0;
+    list-style: none;
+    margin: 0;
+}
+
+.NavItems li {
+    margin: 0 1rem;
+}
+
+.NavItems a {
+    text-decoration: none;
+    color: black;
+}
+
+.NavItems a:hover,
+.NavItems a:active,
+.NavItems a.active {
+    color: white;
+}
