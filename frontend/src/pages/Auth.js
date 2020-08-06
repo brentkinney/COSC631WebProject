@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
 import './Auth.css';
+import AuthContext from '../context/authContext';
 
 class AuthPage extends Component {
     state = {
         isLogin: true
     };
+
+    static contextType = AuthContext;
+
     constructor(props) {
         super(props);
         this.emailElement = React.createRef();
@@ -63,7 +67,14 @@ class AuthPage extends Component {
             return res.json();
         })
         .then(resData => {
-            console.log(resData);
+            if (resData.data.login.token) {
+                this.context.login(
+                    resData.data.login.token,
+                    resData.data.login.userId,
+                    resData.data.login.tokenExpiration
+                );
+            }
+            
         })
         .catch(err => {
             console.log(err);
@@ -72,15 +83,15 @@ class AuthPage extends Component {
     
     render() {
         return <form className="AuthForm" onSubmit={this.submitForm}>
-            <div className="AuthFormItems">
+            <div className="FormItems">
                 <label htmlFor="email">E-Mail</label>
                 <input type="email" id="email" ref={this.emailElement} />                
             </div>
-            <div className="AuthFormItems">              
+            <div className="FormItems">              
                 <label htmlFor="password">Password</label>
                 <input type="password" id="password" ref={this.passwordElement} />
             </div>
-            <div className="AuthFormButtons">               
+            <div className="FormButtons">               
                 <button type="submit">Submit</button>
                 <button type="button" onClick={this.switchMode}>Switch to {this.state.isLogin ? 'Signup' : 'Login'}</button>
             </div>

@@ -8,6 +8,8 @@
     padding: 0 1rem;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
 }
 
 .NavBar h1 {
@@ -16,7 +18,7 @@
 }
 
 .NavItems {
-    margin: 0 0 0 1.5rem;
+    margin-left: 1.5rem;
     
 }
 
@@ -25,19 +27,32 @@
     padding: 0;
     list-style: none;
     margin: 0;
+    align-items: center;
 }
 
 .NavItems li {
     margin: 0 1rem;
 }
 
-.NavItems a {
+.NavItems a,
+.NavItems button {
     text-decoration: none;
     color: black;
+    border: none;
+    font: inherit;
+    background: transparent;
+    cursor: pointer;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0.25rem .5rem;
 }
 
 .NavItems a:hover,
 .NavItems a:active,
-.NavItems a.active {
+.NavItems a.active,
+.NavItems button:hover,
+.NavItems button:active {
     color: white;
+    border-radius: 5px;
+    background: black;
 }
