@@ -62,7 +62,7 @@ class EventsPage extends Component {
 
        const token = this.context.token;
         
-        fetch('http://localhost:8000/graphql', {
+        fetch('http://localhost:80/graphql', {
             method: 'POST',
             body: JSON.stringify(request),
             headers: {
@@ -126,7 +126,7 @@ class EventsPage extends Component {
 
        const token = this.context.token;
         
-        fetch('http://localhost:8000/graphql', {
+        fetch('http://localhost:80/graphql', {
             method: 'POST',
             body: JSON.stringify(request),
             headers: {

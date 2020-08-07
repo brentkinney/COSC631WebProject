@@ -39,7 +39,7 @@ mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PA
     useUnifiedTopology: true
 })
 .then(() => {
-    app.listen(process.env.PORT || 8000);
+    app.listen(process.env.PORT || 80);
 }).catch(err => {
     console.log(err);
 });
