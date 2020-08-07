@@ -44,7 +44,7 @@ class EventsPage extends Component {
             return;
         }
 
-        const event = {title, description, price, hours, date};
+        //const event = {title, description, price, hours, date};
         const request = {
             query: `
                 mutation {

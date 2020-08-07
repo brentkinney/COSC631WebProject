@@ -17,6 +17,7 @@ const eventList = props => {
              />
         )
         }
+        return null;
     });
     return (<ul className="EventsList">{events}</ul>)    
 };
