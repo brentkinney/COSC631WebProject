@@ -3,11 +3,14 @@ import './Events.css';
 import Modal from '../components/Modal/Modal';
 import Backdrop from '../components/Backdrop/Backdrop';
 import AuthContext from '../context/authContext';
+import EventList from '../components/EventList/EventList';
 
 class EventsPage extends Component {
     state = {
         creating: false,
-        events: []
+        events: [],
+        isLoading: false,
+        selectedEvent: null
     };
 
     static contextType = AuthContext;
@@ -51,11 +54,7 @@ class EventsPage extends Component {
                         description
                         price
                         hours
-                        date
-                        createdBy {
-                            _id
-                            email
-                        }
+                        date                       
                     }
                 }
             `
@@ -79,7 +78,21 @@ class EventsPage extends Component {
         })
         .then(resData => {
             console.log(resData);
-            this.fetchEvents();
+            this.setState(prevState =>{
+                const updatedEvents = [...prevState.events];
+                updatedEvents.push({
+                    _id: resData.data.createEvent._id,
+                    title: resData.data.createEvent.title,
+                    description: resData.data.createEvent.description,
+                    price: resData.data.createEvent.price,
+                    hours: resData.data.createEvent.hours,
+                    date: resData.data.createEvent.date,
+                    createdBy: {
+                        _id: this.context.userId                    
+                    }
+                });
+                return {events: updatedEvents};
+            });
         })
         .catch(err => {
             console.log(err);
@@ -87,10 +100,11 @@ class EventsPage extends Component {
     };
 
     modalCancel = () => {
-        this.setState({creating: false});
+        this.setState({creating: false, selectedEvent: null});
     };
 
     fetchEvents () {
+        this.setState({isLoading:true})
         const request = {
             query: `
                 query {
@@ -128,20 +142,29 @@ class EventsPage extends Component {
         })
         .then(resData => {
             const events = resData.data.events;
-            this.setState({events: events});
+            this.setState({events: events, isLoading: false});
         })
         .catch(err => {
             console.log(err);
+            this.setState({isLoading: false});
         });
     }
 
-    render() {
-        const eventList = this.state.events.map(event => {
-        return <li key={event._id} className="EventsListItems">{event.title}</li>;
+    showDetail = eventId => {
+        this.setState(prevState => {
+            const selectedEvent = prevState.events.find(e => e._id === eventId);
+            return {selectedEvent: selectedEvent};
         });
+    }
+
+    deleteEvent  = () => {}
+
+    editEvent  = () => {}
+
+    render() {        
         return (
             <React.Fragment>
-                {this.state.creating && <Backdrop/>}
+                {(this.state.creating || this.state.selectedEvent) && <Backdrop/>}
                 {this.state.creating && <Modal title="Add Event" canCancel canConfirm onCancel={this.modalCancel} onConfirm={this.modalConfirm}>
                     <form>
                         <div className="FormItems">
@@ -165,12 +188,22 @@ class EventsPage extends Component {
                             <textarea id="description" rows="4" ref={this.descriptionElement}/>
                         </div>
                     </form>
-                    </Modal>}      
+                    </Modal>}
+                    {this.state.selectedEvent && (<Modal title={this.state.selectedEvent.title} canCancel 
+                    onCancel={this.modalCancel}>
+                        <h1>{this.state.selectedEvent.title}</h1>
+                        <h2>{this.state.selectedEvent.hours}hrs - {new Date(this.state.selectedEvent.date).toLocaleDateString()}</h2>
+                    <h2>${this.state.selectedEvent.price}</h2>
+                    <p>{this.state.selectedEvent.description}</p>
+                    </Modal>)}    
                 <div className="EventsPage">
                 <p>Create a new Event!</p>  
                     <button className="btn" onClick={this.startCreateEvent}>Create Event</button>
                 </div>
-                <ul className="EventsList">{eventList}</ul>             
+                {this.state.isLoading ? 
+                <div className="Spinner"><div className="lds-dual-ring"></div></div> :  
+                <EventList events={this.state.events} authUserId={this.context.userId} onViewDetail={this.showDetail}/>}
+                          
             </React.Fragment>
         );
     }
