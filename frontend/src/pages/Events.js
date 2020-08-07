@@ -234,7 +234,7 @@ class EventsPage extends Component {
                     {this.state.selectedEvent && (<Modal title={this.state.selectedEvent.title} canCancel 
                     onCancel={this.modalCancel}>
                         <h1>{this.state.selectedEvent.title}</h1>
-                        <h2>{this.state.selectedEvent.hours}hrs - {new Date(this.state.selectedEvent.date).toLocaleDateString()}</h2>
+                        <h2>{this.state.selectedEvent.hours}hrs - {new Date(this.state.selectedEvent.date).toLocaleDateString()} {new Date(this.state.selectedEvent.date).toLocaleTimeString()}</h2>
                     <h2>${this.state.selectedEvent.price}</h2>
                     <p>{this.state.selectedEvent.description}</p>
                     </Modal>)}    
