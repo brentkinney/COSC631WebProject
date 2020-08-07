@@ -6,7 +6,7 @@ const eventItem = props => (
         <React.Fragment>
         <div>
             <h1>{props.title}</h1>
-            <h2>{props.hours}hrs - {new Date(props.date).toLocaleDateString()}</h2>
+            <h2>{props.hours}hrs - {new Date(props.date).toLocaleDateString()} {new Date(props.date).toLocaleTimeString()}</h2>
         </div>
         <div>
             <button className="btn" onClick={props.onDetail.bind(this, props.eventId)}>View Details</button>
