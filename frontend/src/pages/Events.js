@@ -159,7 +159,7 @@ class EventsPage extends Component {
 
     deleteEvent  = () => {}
 
-    editEvent  = () => {}
+    editEvent  = () => {} //comment added to test azure deploy
 
     render() {        
         return (
