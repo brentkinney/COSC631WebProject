@@ -124,5 +124,18 @@ module.exports = {
         expiresIn: '2h'
         });
         return {userId: user.id, token: token, tokenExpiration: 2}
+    },
+
+    deleteEvent: async (args, req) => {
+        if (!req.isAuth) {
+            throw new Error('Unauthenticated!');
+          }
+          try {
+            const event = await Event.findById(args.eventId).populate('event');            
+            await Event.deleteOne({ _id: args.eventId });
+            return event;
+          } catch (err) {
+            throw err;
+          }
     }
 }

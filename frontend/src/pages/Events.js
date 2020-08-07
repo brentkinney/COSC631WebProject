@@ -157,7 +157,49 @@ class EventsPage extends Component {
         });
     }
 
-    deleteEvent  = () => {}
+    deleteEvent  = eventId => {
+        this.setState({ isLoading: true });
+        const request = {
+          query: `
+                mutation {
+                    deleteEvent(eventId: "${eventId}") {                 
+                    _id                              
+                    }
+                }
+            `,
+          variables: {
+            id: eventId
+          }
+        };
+    
+        fetch('http://localhost:80/graphql', {
+          method: 'POST',
+          body: JSON.stringify(request),
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: 'Bearer ' + this.context.token
+          }
+        })
+          .then(res => {
+            if (res.status !== 200 && res.status !== 201) {
+              throw new Error('Failed!');
+            }
+            return res.json();
+          })
+          .then(resData => {
+            this.setState(prevState => {
+              const updatedEvents = prevState.events.filter(event => {
+                return event._id !== eventId;
+              });
+              return { events: updatedEvents, isLoading: false };
+            });
+          })
+          .catch(err => {
+            console.log(err);
+            this.setState({ isLoading: false });
+          });
+      };
+    
 
     editEvent  = () => {} //comment added to test azure deploy
 
@@ -202,7 +244,7 @@ class EventsPage extends Component {
                 </div>
                 {this.state.isLoading ? 
                 <div className="Spinner"><div className="lds-dual-ring"></div></div> :  
-                <EventList events={this.state.events} authUserId={this.context.userId} onViewDetail={this.showDetail}/>}
+                <EventList events={this.state.events} authUserId={this.context.userId} onViewDetail={this.showDetail} onDeleteEvent={this.deleteEvent}/>}
                           
             </React.Fragment>
         );

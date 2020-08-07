@@ -10,8 +10,8 @@ const eventItem = props => (
         </div>
         <div>
             <button className="btn" onClick={props.onDetail.bind(this, props.eventId)}>View Details</button>
-            <button className="btn">Edit Event</button>
-            <button className="btn">Delete Event</button>
+            
+            <button className="btn" onClick={props.onDelete.bind(this, props.eventId)}>Delete Event</button>
         </div>
         </React.Fragment>
     </li>

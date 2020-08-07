@@ -45,6 +45,7 @@ type RootQuery {
 type RootMutation {       
     createEvent(eventInput: EventInput): Event
     createUser(userInput: UserInput): User
+    deleteEvent(eventId: ID!): Event!
 }
 
 schema {

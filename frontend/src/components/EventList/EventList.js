@@ -14,6 +14,7 @@ const eventList = props => {
             hours={event.hours}
             date={event.date}
             onDetail={props.onViewDetail}
+            onDelete={props.onDeleteEvent}
              />
         )
         }
