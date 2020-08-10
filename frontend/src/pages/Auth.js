@@ -30,6 +30,8 @@ class AuthPage extends Component {
         const email = this.emailElement.current.value;
         const password = this.passwordElement.current.value;        
         if(email.trim().length === 0 || password.trim().length ===0) {
+            this.setState({userMessage:"Please enter a value for both email and password"});
+            this.setState({createUser: true});
             return;
         }
         let request = {
