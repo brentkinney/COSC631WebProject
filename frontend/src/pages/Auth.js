@@ -1,18 +1,22 @@
 import React, { Component } from 'react';
 import './Auth.css';
 import AuthContext from '../context/authContext';
+import Modal from '../components/Modal/Modal';
+import Backdrop from '../components/Backdrop/Backdrop';
 
 class AuthPage extends Component {
     state = {
-        isLogin: true
+        isLogin: true,
+        createUser: false,
+        userMessage: ''
     };
 
-    static contextType = AuthContext;
+    static contextType = AuthContext;    
 
     constructor(props) {
         super(props);
         this.emailElement = React.createRef();
-        this.passwordElement = React.createRef();
+        this.passwordElement = React.createRef();        
     }
 
     switchMode = () => {
@@ -24,7 +28,7 @@ class AuthPage extends Component {
     submitForm = event => {
         event.preventDefault();
         const email = this.emailElement.current.value;
-        const password = this.passwordElement.current.value;
+        const password = this.passwordElement.current.value;        
         if(email.trim().length === 0 || password.trim().length ===0) {
             return;
         }
@@ -51,6 +55,7 @@ class AuthPage extends Component {
                     }
                 `
             };
+            
         }
         
         fetch('http://localhost:80/graphql', {
@@ -61,28 +66,58 @@ class AuthPage extends Component {
             }
         })
         .then(res => {
-            if (res.status !== 200 && res.status !== 201) {
-                throw new Error('Request Failed!');
-            }
+            //if (res.status !== 200 && res.status !== 201) {
+                //const resJson = JSON.parse(res.body)
+                //const resJson = res.message;
+                //this.setState({userMessage:resJson.errors.message});
+                //res.json();
+                //console.log(res.promise.value);
+                //console.log(res.headers.values);
+               // console.log(resJson.message);
+                //console.log(resJson.errors);
+               // console.log(resJson.errors.message);
+               // throw new Error('Request Failed!');
+                
+            //}            
             return res.json();
         })
         .then(resData => {
-            if (resData.data.login.token) {
-                this.context.login(
+            if (resData.errors){
+                this.setState({userMessage:resData.errors[0].message}); 
+            }               
+            if (resData.data.login.token) {                
+                 this.context.login(
                     resData.data.login.token,
                     resData.data.login.userId,
-                    resData.data.login.tokenExpiration
-                );
-            }
-            
+                    resData.data.login.tokenExpiration,                    
+                );                                                                       
+            }                        
         })
         .catch(err => {
-            console.log(err);
+            console.log(err);                      
         });
+        if (!this.state.isLogin) {
+            this.setState({userMessage:"Request sucessful, please close this window and log in using your newly created login and password."});
+            this.setState({createUser: true});
+        }
+    };
+
+    modalCancel = () => {
+        this.setState({createUser: false, userMessage:''});
     };
     
     render() {
-        return <form className="AuthForm" onSubmit={this.submitForm}>
+        return ( 
+        <React.Fragment>
+            {this.state.createUser && <Backdrop/>}
+            {this.state.createUser && <Modal title="Create User" canCancel onCancel={this.modalCancel}>
+        <p>{this.state.userMessage}</p>
+            </Modal>}
+            {(this.state.isLogin && this.state.userMessage) && <Backdrop/>}
+            {(this.state.isLogin && this.state.userMessage) && <Modal title="Login" canCancel onCancel={this.modalCancel}>
+        <p>{this.state.userMessage}</p>
+            </Modal>}
+        <form className="AuthForm" onSubmit={this.submitForm}>
             <div className="FormItems">
                 <label htmlFor="email">E-Mail</label>
                 <input type="email" id="email" ref={this.emailElement} />                
@@ -95,7 +130,9 @@ class AuthPage extends Component {
                 <button type="submit">Submit</button>
                 <button type="button" onClick={this.switchMode}>Switch to {this.state.isLogin ? 'Signup' : 'Login'}</button>
             </div>
-        </form>;
+        </form>
+        </React.Fragment>
+        );
     }
 }
 
