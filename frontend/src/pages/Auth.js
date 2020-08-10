@@ -65,20 +65,7 @@ class AuthPage extends Component {
                 'Content-Type': 'application/json'
             }
         })
-        .then(res => {
-            //if (res.status !== 200 && res.status !== 201) {
-                //const resJson = JSON.parse(res.body)
-                //const resJson = res.message;
-                //this.setState({userMessage:resJson.errors.message});
-                //res.json();
-                //console.log(res.promise.value);
-                //console.log(res.headers.values);
-               // console.log(resJson.message);
-                //console.log(resJson.errors);
-               // console.log(resJson.errors.message);
-               // throw new Error('Request Failed!');
-                
-            //}            
+        .then(res => {                
             return res.json();
         })
         .then(resData => {
