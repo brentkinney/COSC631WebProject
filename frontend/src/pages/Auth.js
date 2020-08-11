@@ -71,24 +71,30 @@ class AuthPage extends Component {
             return res.json();
         })
         .then(resData => {
-            if (resData.errors){
+            if (resData.errors && !this.state.isLogin){
+                this.setState({userMessage:resData.errors[0].message});
+                this.setState({createUser: true});
+            }
+            else if (resData.errors){
                 this.setState({userMessage:resData.errors[0].message}); 
-            }               
+            }                     
+            else {
+                this.setState({userMessage:"Request sucessful, please close this window and log in using your newly created login and password."});
+                this.setState({createUser: true});
+            }
             if (resData.data.login.token) {                
                  this.context.login(
                     resData.data.login.token,
                     resData.data.login.userId,
                     resData.data.login.tokenExpiration,                    
                 );                                                                       
-            }                        
+            }
+                                  
         })
         .catch(err => {
             console.log(err);                      
         });
-        if (!this.state.isLogin) {
-            this.setState({userMessage:"Request sucessful, please close this window and log in using your newly created login and password."});
-            this.setState({createUser: true});
-        }
+        
     };
 
     modalCancel = () => {
